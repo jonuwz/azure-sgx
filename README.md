@@ -8,16 +8,18 @@ create 2 machines
 
 log into 1 of the machines, run ./script.sh in the homedirectory to setup all the sgx + ego requirements
 
-```cd samples/attested_tls
+```bash
+cd samples/attested_tls
 ego-go build server
 ego sign server
 ego signerid server   <- remember this
 ego run server
-'''
+```
 
 log into the other machine, run ./script.sh to setup all the sgx and ego requirements
 
-```cd samples/attested_tls
+```bash
+cd samples/attested_tls
 CGO_CFLAGS=-I/opt/ego/include CGO_LDFLAGS=-L/opt/ego/lib go build ra_client/client.go
 ./client -a <ip of the 1st machine>:8080 -s <signerid taken from above>
 ```
