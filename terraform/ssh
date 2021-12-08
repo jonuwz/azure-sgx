@@ -1,0 +1,22 @@
+#!/bin/bash
+out="$(terraform show -json | jq -r '.values.root_module.resources[] | select(.type=="azurerm_linux_virtual_machine") | select(.public_ip_address!="") | [ .values.computer_name,.values.public_ip_address ] | @csv')"
+
+ips=( $(echo $out) )
+
+if [[ ${#ips[@]} > 1 ]];then
+  if [[ ! -z $1 ]];then
+    choice=$1
+    shift
+  else
+    for i in "${!ips[@]}"; do 
+      printf "%s\t%s\n" "$i" "${ips[$i]}"
+    done
+    read -p "Which one ? " choice
+  fi
+else
+  choice=0
+fi
+
+ip="$(echo ${ips[$choice]} | awk -F\" '{print $4}')"
+
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $@ john@$ip 
